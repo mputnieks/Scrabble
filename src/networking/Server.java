@@ -17,9 +17,10 @@ import model.Tile;
  */
 public class Server extends Thread {
 
-    public static void createServer(int port) {
+    public static Server createServer(int port) {
         Server server = new Server(port);
         server.start();
+        return server;
     }
 
     private Game currentgame;
@@ -34,7 +35,8 @@ public class Server extends Thread {
         try {
 			ss = new ServerSocket(portArg);
 		} catch (IOException e) {
-			e.printStackTrace();
+			exit = true;
+			System.out.println("THE PORT 2728 WAS TAKEN!");
 		}
     }
     
@@ -68,13 +70,16 @@ public class Server extends Thread {
 		}
     }
     
-    public void finishMove(ClientHandler ch, String coordinates) {
+    public void finishMove(ClientHandler ch, String coordinates) { // FINISH !!!!
 		if(currentgame.getBoard().containsValidWords()) {
 			int score = currentgame.getBoard().executeMove();
 			currentgame.getCurrentPlayer().addToScore(score);
 			currentgame.getCurrentPlayer().getTray().fill(currentgame.getTileBag());
 			
 			broadcast(Protocol.MOVE + Protocol.SEPARATOR + currentgame.getCurrentPlayer().getName() + Protocol.SEPARATOR + coordinates + Protocol.SEPARATOR + String.valueOf(score));
+			
+			// CHECK FOR GAME-OVER
+			
 			ch.sendMessage(Protocol.TILES + Protocol.SEPARATOR + tilesToString(currentgame.getCurrentPlayer().getTray().getTiles()));
 			
 			currentgame.nextPlayer();
@@ -96,11 +101,12 @@ public class Server extends Thread {
     		for (int j = 0; j < tiles.size(); j++) {
         		if (tiles.get(j).getName().equals(tileNames[i]) && !tilesToSwap.contains(tiles.get(j))) {
         			tilesToSwap.add(tiles.get(j));
+        			break;
         		}
         	}
     	}
     	
-    	if (hasTiles(currentgame.getCurrentPlayer(), tileNames)) {	// Player had all tiles, let's do a swap
+    	if (tileNames.length == tilesToSwap.size()) {	// Player had all tiles, let's do a swap
     		if (!currentgame.getTileBag().isEmpty()) { 
     			List<Tile> replaced_tiles = new ArrayList<Tile>();
     			for(int i = 0; i < tilesToSwap.size(); i++) {
@@ -144,19 +150,23 @@ public class Server extends Thread {
     public boolean hasTiles(Player p, String[] tileNames) {
     	List<Tile> tilesPresent = new ArrayList<Tile>();
     	List<Tile> tiles = p.getTray().getTiles();
+    	
     	for (int i = 0; i<tileNames.length; i++) {
     		for (int j = 0; j < tiles.size(); j++) {
     			if(tileNames[i].contains("-")) {
     				if (tiles.get(j).isBlank() && !tilesPresent.contains(tiles.get(j))) {
             			tilesPresent.add(tiles.get(j));
+            			break;
             		}
     			}else {
     				if (tiles.get(j).getName().equals(tileNames[i]) && !tilesPresent.contains(tiles.get(j))) {
             			tilesPresent.add(tiles.get(j));
+            			break;
             		}
     			}
         	}
     	}
+    	System.out.println("tileNames: "+tileNames.length+" tilesPresent: "+tilesPresent.size());
     	if (tileNames.length == tilesPresent.size()) {
     		return true;
     	}
@@ -175,8 +185,7 @@ public class Server extends Thread {
 					t.start();
 				}
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				System.out.println("Socket is likely closed - server is no longer functional!");
 			}
 		}
     }
@@ -261,4 +270,17 @@ public class Server extends Thread {
     public void removePlayer(Player p) {
         players.remove(p);
     }
+    
+    public void shutdown() {
+		broadcast(Protocol.ABORT+Protocol.SEPARATOR+"SERVER");
+		print("Closing socket connection...");
+		try {
+			exit = true;
+			ss.close();
+		} catch (IOException e) {
+			print("Error: Unsuccessful shutdown!");
+			e.printStackTrace();
+		}
+	}
+    
 }

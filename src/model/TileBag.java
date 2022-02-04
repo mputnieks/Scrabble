@@ -61,7 +61,7 @@ public class TileBag {
 		return null;
 	}
 
-	public void addTiles(List<Tile> t) {
-		tiles.addAll(t);
-	}
+	public void addTiles(List<Tile> t) { tiles.addAll(t); }
+
+	public void addTile(Tile tile) { tiles.add(tile); }
 }

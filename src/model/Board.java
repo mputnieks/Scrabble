@@ -344,14 +344,16 @@ public class Board {
 		ScrabbleWordChecker inMemoryChecker = new InMemoryScrabbleWordChecker();
 		
 		for (int i = 0; i < words.size(); i++) {
-			ScrabbleWordChecker.WordResponse response = inMemoryChecker.isValidWord(words.get(i));
-	        if(response == null) {
-	            System.out.println("The word \"" + words.get(i) + "\" is not known in the dictionary!");
-	            return false;
-	        }
-	        else {
-	            System.out.println(response);
-	        }
+			if(words.get(i).length() > 1) {		// stupid fix but it works - fixes a bug where if one letter placed it is thought of as word
+				ScrabbleWordChecker.WordResponse response = inMemoryChecker.isValidWord(words.get(i));
+		        if(response == null) {
+		            System.out.println("The word \"" + words.get(i) + "\" is not known in the dictionary!");
+		            return false;
+		        }
+		        else {
+		            System.out.println(response);
+		        }
+			}
 		}
 		
 		return true;
@@ -422,13 +424,13 @@ public class Board {
 	}
 	
 	public boolean placeTiles(int[] pos, String[] tileNames, Player p) {	// BLANKS ARE NOT YET WORKED OUT!!!!!
-		List<Tile> player_tiles = p.getTray().getTiles();
 		for(int i = 0; i < tileNames.length; i++) {
+			List<Tile> player_tiles = p.getTray().getTiles();
 			for (int j = 0; j < player_tiles.size(); j++) {
         		if (player_tiles.get(j).getName().equals(tileNames[i])) {
         			System.out.println(pos[i]);
         			boolean placed = placeTile(pos[i], player_tiles.get(j));
-        			player_tiles.remove(player_tiles.get(j));
+        			p.getTray().removeTile(player_tiles.get(j));
         			if(!placed) {
         				System.out.println("Non valid positions for tiles");
         				return false;

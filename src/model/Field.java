@@ -45,8 +45,6 @@ public class Field {
 	public boolean wasClicked(int mouse_x, int mouse_y) {
 		if (this.hitbox_x < mouse_x && this.hitbox_x + FIELD_SIZE > mouse_x) {
 			if (this.hitbox_y < mouse_y && this.hitbox_y + FIELD_SIZE > mouse_y) {
-				
-				System.out.println("Field was clicked!");
 				return true;
 			}
 		}
@@ -75,7 +73,6 @@ public class Field {
 	public Node updateGraphics(int x, int y, int root_zero_x, int root_zero_y){
 	    sprite.setTranslateX(x); hitbox_x = root_zero_x + x;
 	    sprite.setTranslateY(y); hitbox_y = root_zero_y + y;
-	    System.out.println("Hitbox_x: "+hitbox_x+" Hitbox_y: "+hitbox_y);
 	    
 	    return sprite;
 	}

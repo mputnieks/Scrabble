@@ -80,7 +80,6 @@ public class Client extends Thread {
     			}
     		} catch (IOException e1) {
     			System.out.println("Error: Did not manage to receive the message!");
-    			e1.printStackTrace();
     		}
     	}while(exit == false);
 	}
@@ -121,7 +120,7 @@ public class Client extends Thread {
 	    	  // nothing to do
 		    break;
 	      case Protocol.TILES:
-	    	  c.setTilesToAdd(arg1.split(Protocol.AS));
+	    	  c.pushTilesToAdd(arg1.split(Protocol.AS), true);
 			break;
 	      case Protocol.TURN:
 	    	  // maybe should display current player ??????????
@@ -132,22 +131,23 @@ public class Client extends Thread {
 	      case Protocol.MOVE:
 	    	  // maybe should display player scores ????????????
 	    	  if(arg1.equals(clientName)) {
-	    		  c.updateBoard(arg2, true);
+	    		  c.pushBoardUpdate(arg2, true);
 	    	  }else {
-	    		  c.updateBoard(arg2, false);
+	    		  c.pushBoardUpdate(arg2, false);
 	    	  }
 	    	break;
 	      case Protocol.PASS:
 	    	  if (arg2.equals("")) {
 	    		  // nothing to do, a successful pass has occured
 	    	  }else {
-	    		  c.setTilesToAdd(arg2.split(Protocol.AS));
+	    		  c.pushTilesToAdd(arg2.split(Protocol.AS), false);
 	    	  }
 			break;
 	      case Protocol.GAMEOVER:
 	    	  
 			break;
 	      case Protocol.ERROR:
+	    	  c.pushTilePickup();
 	    	  print(arg1);
 				break;
 	      default:
@@ -171,8 +171,8 @@ public class Client extends Thread {
 		sendMessage(Protocol.ABORT+Protocol.SEPARATOR+clientName);
 		print("Closing socket connection...");
 		try {
-			sock.close();
 			exit = true;
+			sock.close();
 		} catch (IOException e) {
 			print("Error: Unsuccessful shutdown!");
 			e.printStackTrace();

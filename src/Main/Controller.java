@@ -19,7 +19,6 @@ import networking.Server;
 import view.BlankTilePopUp;
 import view.MousepadListener;
 import view.StartupPopUp;
-import view.VisualsManager;
 
 public class Controller {
 	
@@ -37,7 +36,13 @@ public class Controller {
 	private boolean paused = true;
 	private boolean start_game = false;
 	private boolean tile_addition_required = false;
+	private boolean board_update_available = false;
+	private boolean board_update_for_this_player;
+	private boolean rewrite_old_tiles;
+	private boolean pickup_tiles;
+	private Server server;
 	private String[] tiles_to_add;
+	private String coordinates;
 	
 	public Controller() {
 		// VIEW ELEMENTS:
@@ -51,7 +56,6 @@ public class Controller {
 			this.bag = TileBag.createTileBag(PATH+"complete_tile_list.txt");
 		} catch (IOException e) {
 			System.out.println("Error: files special_fields.txt or complete_tile_list.txt failed loading!");
-			e.printStackTrace();
 		}
 		
 		// START GAME MENU
@@ -59,7 +63,7 @@ public class Controller {
 	}
 	
 	public void createGame(String name) {
-		Server.createServer(PORT);
+		server = Server.createServer(PORT);
 		joinGame(name);
 	}
 
@@ -74,18 +78,19 @@ public class Controller {
 	
 	public void startGame() {
 		start_game = true;
-		setPaused(true);
 	}
 	
 	public void swap(String tileNames) {
 		System.out.println("swapper clicked!");
 		local_client.sendMessage(Protocol.PASS + Protocol.SEPARATOR + tileNames);
+		pushTilePickup();
 		setPaused(true);
 	}
 	
 	public void skipMove() {
 		System.out.println("skip clicked!");
 		local_client.sendMessage(Protocol.PASS);
+		pushTilePickup();
 		setPaused(true);
 	}
 	
@@ -108,8 +113,40 @@ public class Controller {
 		// EXTRACT MOVE AND SEND TO SERVER!
 		local_client.sendMessage(Protocol.MOVE + Protocol.SEPARATOR + player.getName() + Protocol.SEPARATOR + board.extractMove());		
 		// probably have to remove the tiles now, and wait for the server response.
-		player.getTray().addTiles(board.pickupNonFixed()); // removes non-fixed from board and adds back to player
 		setPaused(true);
+	}
+	
+	// -- PUSH COMMANDS AND THEIR EXECUTOR METHODS --
+	
+	public void pushTilesToAdd(String[] tileNames, boolean rewriteTiles) {
+		rewrite_old_tiles = rewriteTiles;
+		tiles_to_add = tileNames;
+		tile_addition_required = true;
+	}
+	
+	public void pushBoardUpdate(String c, boolean thisPlayer) {
+		coordinates = c;
+		board_update_for_this_player = thisPlayer;
+		board_update_available = true;
+	}
+	
+	public void pushTilePickup() {
+		pickup_tiles = true;
+	}
+	
+	private void addTiles(String[] tileNames, boolean rewriteTiles) {
+		if(rewriteTiles) {
+			while(player.getTray().getTiles().size() > 0){
+				bag.addTile(player.getTray().getTiles().get(0));
+				player.getTray().removeTile(player.getTray().getTiles().get(0));
+			}
+		}
+		swapper.emptySwapper(bag);
+		List<Tile> tiles = new ArrayList<Tile>();
+		for (int i = 0; i < tileNames.length; i++) {
+			tiles.add(bag.getTileByName(tileNames[i]));
+		}
+		player.getTray().addTiles(tiles);
 	}
 	
 	public void updateBoard(String c, boolean thisPlayer) {
@@ -125,27 +162,13 @@ public class Controller {
 				pos[i] = Integer.parseInt(coord[i].strip().substring(1));
 			}
 		}
-		if(thisPlayer) {
-			board.placeTiles(pos, tileNames, player);
-		}else {
+		if(!thisPlayer) {
 			board.placeTiles(pos, tileNames, bag);
 		}
 		board.executeMove();
 	}
 	
-	public void setTilesToAdd(String[] tileNames) {
-		tiles_to_add = tileNames;
-		tile_addition_required = true;
-	}
-	
-	private void addTiles(String[] tileNames) {
-		swapper.emptySwapper(bag);
-		List<Tile> tiles = new ArrayList<Tile>();
-		for (int i = 0; i < tileNames.length; i++) {
-			tiles.add(bag.getTileByName(tileNames[i]));
-		}
-		player.getTray().addTiles(tiles);
-	}
+	// -- OTHER COMMANDS --
 	
 	public static void addToRoot(Node n) {
 		Scrabble.root.getChildren().add(n);
@@ -160,6 +183,7 @@ public class Controller {
 			mouse.update();
 		}
 		if (start_game) {
+			setPaused(true);
 			board.initGraphics();
 			player.getTray().initGraphics();
 			
@@ -168,12 +192,19 @@ public class Controller {
 			button.initGraphics();
 			mouse.initGraphics(); // Always last!
 			
-			paused = false;
 			start_game = false;
 		}
+		if(pickup_tiles) {
+			player.getTray().addTiles(board.pickupNonFixed());
+			pickup_tiles = false;
+		}
 		if (tile_addition_required) {
-			addTiles(tiles_to_add);
+			addTiles(tiles_to_add, rewrite_old_tiles);
 			tile_addition_required = false;
+		}
+		if (board_update_available) {
+			updateBoard(coordinates, board_update_for_this_player);
+			board_update_available = false;
 		}
 	}
 	
@@ -210,5 +241,9 @@ public class Controller {
     	return f;
     }
 
+	public void exit() {
+		if (local_client != null) {local_client.shutdown();}
+		if (server != null) {server.shutdown();}
+	}
 	
 }

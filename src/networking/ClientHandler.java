@@ -8,7 +8,6 @@ import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.net.SocketException;
 
-import javafx.scene.paint.Color;
 import model.LocalHumanPlayer;
 import model.Player;
 
@@ -71,11 +70,9 @@ public class ClientHandler extends Thread {
 				decodeClientMsg(msg);
 	    		}catch(SocketException e2) {
 	    			shutdown();
-	    			e2.printStackTrace();
 	    		}
 			} catch (IOException e) {
 				shutdown();
-				e.printStackTrace();
 			}
     	}while(!exit);
     }
