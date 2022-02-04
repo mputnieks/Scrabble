@@ -2,8 +2,8 @@ package model;
 
 public class LocalHumanPlayer extends Player {
 
-    public LocalHumanPlayer(String name, TileTray tray) {
-    	super(name, tray);
+    public LocalHumanPlayer(String name) {
+    	super(name);
     }
     
     @Override

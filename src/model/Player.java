@@ -4,15 +4,15 @@ public abstract class Player {
 	
 	    // -- Instance variables -----------------------------------------
 
-		private TileTray tray = new TileTray();
+		private TileTray tray = new TileTray(10, 0, Field.FIELD_SIZE*9);
 	    private String name;
 	    private int score;
+	    private boolean ready = false;
 
 	    // -- Constructors -----------------------------------------------
 
-	    public Player(String name, TileTray tray) {
+	    public Player(String name) {
 	        this.name = name;
-	        this.tray = tray;
 	        this.score = 0;
 	    }
 
@@ -23,6 +23,10 @@ public abstract class Player {
 	    public TileTray getTray() { return tray; }
 	    
 	    public int getScore() { return score; }
+	    
+	    public void setReady() { ready = true; }
+	    
+	    public boolean isReady() { return ready; }
 	    
 	    public void addToScore(int n) { score += n; }
 	    

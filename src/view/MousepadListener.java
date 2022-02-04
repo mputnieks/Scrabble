@@ -28,8 +28,6 @@ public class MousepadListener {
 		Scrabble.root.setOnMouseClicked(e -> {
 			mouseX = (int) e.getX();
             mouseY = (int) e.getY();
-            System.out.println("click!");
-            System.out.println("mouse_x: " + mouseX + " mouse_y: " + mouseY);
             controller.onMouseClick(mouseX, mouseY);
         });
 	}

@@ -1,18 +1,21 @@
 package model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import Main.Controller;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
-import model.Field.FieldType;
 import view.VisualsManager;
 
 public class Swapper {
 
 	private Group sprite;
 	private Button btn;
-	private Field field = new Field(FieldType.NORMAL);
+	private TileTray tray = new TileTray(7, -Field.FIELD_SIZE*10, Field.FIELD_SIZE*9);
 	
 	public Swapper(Controller c) {
 		this.sprite = VisualsManager.getSwapper();
@@ -21,8 +24,8 @@ public class Swapper {
         btn.setOnAction(new EventHandler<ActionEvent>() {   
             @Override  
             public void handle(ActionEvent arg0) {
-            	if (field.hasTile()) {
-            		c.swap();
+            	if (tray.getTiles().size() > 0) {
+            		c.swap(tray.tilesToString());
             	}
             }
         } );
@@ -31,36 +34,32 @@ public class Swapper {
         sprite.getChildren().add(btn);
 	}
 	
-	public void addTile(Tile t) {
-		field.setTile(t);
+	public TileTray getTray() {
+		return tray;
 	}
 	
-	public void removeTile() {
-		field.setTile(null);
+	public void addTile(Tile t) {
+		tray.addTile(t);
+	}
+	
+	public void removeTile(Tile t) {
+		tray.removeTile(t);
 	}
 	
 	public Field hasClickedField(int mouse_x, int mouse_y) {
-		if (field.wasClicked(mouse_x, mouse_y)) {
-			return field;
-		}
-		return null;
+		return tray.hasClickedField(mouse_x, mouse_y);
 	}
 	
-	public void swap(TileBag bag) {
-		if (!bag.isEmpty() && field.hasTile()) {
-			Tile new_tile = bag.exchangeTile(field.getTile());
-			field.setTile(null);
-			field.setTile(new_tile);
+	public void emptySwapper(TileBag bag) {
+		bag.addTiles(tray.getTiles());
+		while(tray.getTiles().size()>0){
+			tray.removeTile(tray.getTiles().get(0));
 		}
 	}
 	
 	public void initGraphics() {
-        sprite.getChildren().add(field.updateGraphics((int)(2*Field.FIELD_SIZE), Field.FIELD_SIZE/2, (int)(-9.5*Field.FIELD_SIZE), Field.FIELD_SIZE*8));
-	    
-		Controller.addToRoot(sprite);
+	    Node tiletray = tray.getGraphics();
+	    Controller.addToRoot(sprite);
+        Controller.addToRoot(tiletray);
 	}
-
-	public void setDisabled(boolean active) {
-		btn.setDisable(active);
-	}	
 }

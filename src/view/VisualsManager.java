@@ -3,7 +3,6 @@ package view;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
-import Main.Scrabble;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -81,13 +80,14 @@ public class VisualsManager {
 		return group;
 	}
 	
-	public static Group getTileTray(int FIELD_COUNT) {
+	public static Group getTileTray(int FIELD_COUNT, int tx, int ty) {
 		Rectangle shape = new Rectangle();
 	    shape.setWidth((FIELD_COUNT+1)*Field.FIELD_SIZE);
 	    shape.setHeight(2*Field.FIELD_SIZE);
 	    shape.setFill(ColorManager.getColor("board_borders"));
 	    Group group = new Group(shape);
-	    group.setTranslateY(Field.FIELD_SIZE*9);
+	    group.setTranslateX(tx);
+	    group.setTranslateY(ty);
 	    
 		return group;
 	}
@@ -115,7 +115,7 @@ public class VisualsManager {
 	    shape.setHeight(2*Field.FIELD_SIZE);
 	    shape.setFill(ColorManager.getColor("board_borders"));
 	    Group group = new Group(shape);
-	    group.setTranslateX(-Field.FIELD_SIZE*8);
+	    group.setTranslateX(-Field.FIELD_SIZE*14);
 	    group.setTranslateY(Field.FIELD_SIZE*9);
 	    
 		return group;
@@ -129,6 +129,20 @@ public class VisualsManager {
 	    Group group = new Group(shape);
 	    group.setTranslateX(+Field.FIELD_SIZE*8);
 	    group.setTranslateY(Field.FIELD_SIZE*9);
+	    
+		return group;
+	}
+	
+	public static Group getBlankTilePopUp() {
+		Rectangle shape = new Rectangle();
+	    shape.setWidth(10*Field.FIELD_SIZE);
+	    shape.setHeight(4*Field.FIELD_SIZE);
+	    shape.setFill(ColorManager.getColor("tiles"));
+	    shape.setArcHeight(10);
+	    shape.setArcWidth(10);
+	    shape.setStrokeWidth(Field.FIELD_SIZE/2);
+	    shape.setStroke(ColorManager.getColor("tiles"));
+	    Group group = new Group(shape);
 	    
 		return group;
 	}

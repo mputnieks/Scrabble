@@ -6,6 +6,7 @@ import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import view.VisualsManager;
 
 public class Scrabble extends Application {
     
@@ -34,7 +35,7 @@ public class Scrabble extends Application {
     @Override
     public void start(Stage primaryStage) {
     	controller = new Controller();
-    	controller.initGraphics();
+    	root.setBackground(VisualsManager.getGameBackground());
         primaryStage.setTitle("Scrabble");
         primaryStage.setScene(new Scene(createContent()));
         primaryStage.show();

@@ -1,5 +1,6 @@
 package model;
 
+import javafx.scene.Group;
 import javafx.scene.Node;
 import view.VisualsManager;
 
@@ -9,15 +10,21 @@ import view.VisualsManager;
  */
 public class Tile {
 
-	private Node sprite;
+	private Group sprite = new Group();
+	private Node sub_sprite;
 	private boolean fixed;
+	private boolean blank = false;
 	private String name;
 	private int value;
 	
 	public Tile(String name, int value) {
+		if (name.equals("-")) {
+			this.blank = true;
+		}
 		this.name = name;
 		this.value = value;
-		this.sprite = VisualsManager.getTile(name);
+		this.sub_sprite = VisualsManager.getTile(name);
+		this.sprite.getChildren().add(this.sub_sprite);
 	}
 	
 	public String getName() {
@@ -30,6 +37,10 @@ public class Tile {
 	
 	public boolean isFixed() {
 		return fixed;
+	}
+	
+	public boolean isBlank() {
+		return blank;
 	}
 	
 	/**
@@ -45,5 +56,12 @@ public class Tile {
      */
 	public Node getGraphics() {
 	    return sprite;
+	}
+
+	public void setName(String input) {
+		this.name = input;
+		sprite.getChildren().remove(sub_sprite);
+		sub_sprite = VisualsManager.getTile(input);
+		sprite.getChildren().add(sub_sprite);
 	}
 }

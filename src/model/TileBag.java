@@ -49,4 +49,19 @@ public class TileBag {
 		tiles.add(t);
 		return new_tile;
 	}
+	
+	public Tile getTileByName(String name) {
+		for (int i = 0; i<tiles.size(); i++) {
+			if (name.equals(tiles.get(i).getName())) {
+				Tile t = tiles.get(i);
+				tiles.remove(i);
+				return t;
+			}
+		}
+		return null;
+	}
+
+	public void addTiles(List<Tile> t) {
+		tiles.addAll(t);
+	}
 }

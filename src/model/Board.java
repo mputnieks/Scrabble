@@ -12,6 +12,7 @@ import checker.InMemoryScrabbleWordChecker;
 import checker.ScrabbleWordChecker;
 import javafx.scene.Group;
 import model.Field.FieldType;
+import networking.Protocol;
 import view.VisualsManager;
 
 public class Board {
@@ -79,7 +80,11 @@ public class Board {
 		List<Field> f = getFieldsNonFixed();
 		List<Tile> tiles = new ArrayList<Tile>();
 		for(int i = 0; i< f.size(); i++) {
-			tiles.add(f.get(i).getTile());
+			Tile t = f.get(i).getTile();
+			if(t.isBlank()) {
+				t.setName("-");
+			}
+			tiles.add(t);
 			f.get(i).setTile(null);
 		}
 		return tiles;
@@ -90,8 +95,15 @@ public class Board {
 		return false;
 	}
 	
+	public boolean placeTile(int pos, Tile tile) {
+		int x = pos % SIZE;
+		int y = pos / SIZE;
+		System.out.println("x: " + x + " y: " + y);
+		return placeTile(x, y, tile);
+	}
+	
 	public boolean placeTile(int x, int y, Tile tile) {
-		if (!isValidField(x,y)) { return false; }
+		if (!isValidField(x,y) || (fields[x][y].hasTile() && !fields[x][y].getTile().isFixed() )) { return false; }
 		fields[x][y].setTile(tile);
 		return true;
 	}
@@ -273,7 +285,6 @@ public class Board {
 		return score;
 	}
 	
-	
 	private boolean continuityCheck(int x, int y, int total, boolean isFirstMove) {
 		
 		String dir = getDirection(x, y);
@@ -410,6 +421,52 @@ public class Board {
 		return score;
 	}
 	
+	public boolean placeTiles(int[] pos, String[] tileNames, Player p) {	// BLANKS ARE NOT YET WORKED OUT!!!!!
+		List<Tile> player_tiles = p.getTray().getTiles();
+		for(int i = 0; i < tileNames.length; i++) {
+			for (int j = 0; j < player_tiles.size(); j++) {
+        		if (player_tiles.get(j).getName().equals(tileNames[i])) {
+        			System.out.println(pos[i]);
+        			boolean placed = placeTile(pos[i], player_tiles.get(j));
+        			player_tiles.remove(player_tiles.get(j));
+        			if(!placed) {
+        				System.out.println("Non valid positions for tiles");
+        				return false;
+        			}
+        			break;
+        		}
+        	}
+		}
+		return true;
+	}
+	
+	public boolean placeTiles(int[] pos, String[] tileNames, TileBag bag) {	// BLANKS ARE NOT YET WORKED OUT!!!!!
+		for(int i = 0; i < tileNames.length; i++) {
+			boolean placed = placeTile(pos[i], bag.getTileByName(tileNames[i]));
+			if(!placed) {
+				System.out.println("Non valid positions for tiles");
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	public String extractMove(){
+		String coord = "";
+		for(int x = 0; x < SIZE; x++) {
+			for(int y = 0; y < SIZE; y++) {
+				if (fields[x][y].hasTile() && !fields[x][y].getTile().isFixed()) {
+					if (fields[x][y].getTile().isBlank()) {
+						coord += "-" + fields[x][y].getTile().getName() + String.valueOf(y*SIZE+x) + Protocol.AS;
+					}else {
+						coord += fields[x][y].getTile().getName() + String.valueOf(y*SIZE+x) + Protocol.AS;
+					}
+				}
+			}
+		}
+		return coord;
+	}
+	
 	public Board deepCopy() {
 		Field[][] fields_copy = new Field[SIZE][SIZE];
 		for(int i = 0; i < SIZE; i++) {
@@ -442,5 +499,26 @@ public class Board {
 			}
 		}
 		return null;
+	}
+	
+	public boolean hasBlankTiles() {
+		List<Field> nff = getFieldsNonFixed();
+		for(int i = 0; i<nff.size(); i++) {
+			if(nff.get(i).getTile().getName().equals("-")) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public List<Tile> getBlankTiles(){
+		List<Field> nff = getFieldsNonFixed();
+		List<Tile> t = new ArrayList<Tile>();
+		for(int i = 0; i<nff.size(); i++) {
+			if(nff.get(i).getTile().isBlank()) {
+				t.add(nff.get(i).getTile());
+			}
+		}
+		return t;
 	}
 }
