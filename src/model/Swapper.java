@@ -1,8 +1,5 @@
 package model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import Main.Controller;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;

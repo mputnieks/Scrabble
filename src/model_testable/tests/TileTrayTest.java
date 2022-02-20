@@ -1,16 +1,17 @@
-package Tests;
+package model_testable.tests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import model.Tile;
-import model.TileBag;
-import model.TileTray;
+import model_testable.Tile;
+import model_testable.TileBag;
+import model_testable.TileTray;
 import networking.Protocol;
 
 
@@ -37,6 +38,12 @@ public class TileTrayTest {
     }
     
     @Test
+    public void testAddTile() throws Exception {
+    	tray.addTile(t1);
+        assertEquals(tray.getTiles().get(0), t1);
+    }
+    
+    @Test
     public void testAddRemoveTile() throws Exception {
     	tray.addTile(t1);
     	assertEquals(tray.getTiles().size(), 1);
@@ -53,16 +60,23 @@ public class TileTrayTest {
     	tray.removeTile(t1);
         assertEquals(tray.tilesToString().split(Protocol.AS).length, 2);
     }
-
-    @Test
-    public void testAddTile() throws Exception {
-    	tray.addTile(t1);
-        assertEquals(tray.getTiles().get(0), t1);
-    }
     
     @Test
     public void testFillTray() throws Exception {
     	tray.fill(bag);
         assertEquals(tray.getTiles().size(), 7);
     }
+    
+    @Test
+    public void testPickUp() throws Exception {
+    	tray.addTile(t1);
+    	tray.addTile(t2);
+    	tray.addTile(t3);
+    	tray.addTile(t4);
+    	List<Tile> tiles = tray.pickupNonFixed();
+    	assertEquals(tiles.size(), 4);
+    	assertEquals(tray.getTiles().size(), 0);
+    	assertTrue(tiles.contains(t1) && tiles.contains(t2) && tiles.contains(t3) && tiles.contains(t4) );
+    }
+    
 }
