@@ -26,7 +26,7 @@ public class LocalHumanPlayer extends Player {
 //	    }
 	    // return the full move information, make move, fix tiles, next player!
 	    
-	    // Client suggests a move, position is the first letter’s position, along with the entire word, give a direction (HOR or VER),
+	    // Client suggests a move, position is the first letters position, along with the entire word, give a direction (HOR or VER),
 	    // MOVE;<position>;<letters>;<direction>!
 	    // Example message string: "MOVE;H8;UNIVERSE;HOR!"
 	    return "MOVE;H8;UNIVERSE;HOR!";

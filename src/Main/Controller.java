@@ -11,6 +11,7 @@ import model.LocalHumanPlayer;
 import model.NextMoveButton;
 import model.Player;
 import model.Swapper;
+import model.Score;
 import model.Tile;
 import model.TileBag;
 import networking.Client;
@@ -27,6 +28,7 @@ public class Controller {
 	private TileBag bag;
 	private Board board;
 	private Swapper swapper;
+	private Score score;
 	private StartupPopUp ospu;
 	private MousepadListener mouse;
 	private NextMoveButton button;
@@ -48,6 +50,7 @@ public class Controller {
 		// VIEW ELEMENTS:
 		this.mouse = new MousepadListener(this);
 		this.swapper = new Swapper(this);
+		this.score = new Score(0, "Player X");
 		this.button = new NextMoveButton(this);
 		
 		// LOAD LOCAL BOARD TO DISPLAY AND TILE BAG TO USE
@@ -165,7 +168,11 @@ public class Controller {
 		if(!thisPlayer) {
 			board.placeTiles(pos, tileNames, bag);
 		}
-		board.executeMove();
+		int points = board.executeMove();
+		if (thisPlayer) {
+			player.addToScore(points);
+			score.setValue(player.getScore());
+		}
 	}
 	
 	// -- OTHER COMMANDS --
@@ -189,6 +196,8 @@ public class Controller {
 			
 			ospu.remove();
 			swapper.initGraphics();
+			score.initGraphics();
+			score.setName(player.getName());
 			button.initGraphics();
 			mouse.initGraphics(); // Always last!
 			

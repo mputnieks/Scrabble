@@ -12,7 +12,7 @@ public class Swapper {
 
 	private Group sprite;
 	private Button btn;
-	private TileTray tray = new TileTray(7, -Field.FIELD_SIZE*10, Field.FIELD_SIZE*9);
+	private TileTray tray = new TileTray(1, -Field.FIELD_SIZE*8, Field.FIELD_SIZE*9);
 	
 	public Swapper(Controller c) {
 		this.sprite = VisualsManager.getSwapper();

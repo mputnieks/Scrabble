@@ -129,7 +129,6 @@ public class Client extends Thread {
 	    	  }
 			break;
 	      case Protocol.MOVE:
-	    	  // maybe should display player scores ????????????
 	    	  if(arg1.equals(clientName)) {
 	    		  c.pushBoardUpdate(arg2, true);
 	    	  }else {

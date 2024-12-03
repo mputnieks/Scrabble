@@ -27,6 +27,14 @@ public class VisualsManager {
 	
 	private static final String PATH = "./files/"; // Path to the test folder with special tile mappings
 
+	public static Node getScore(String name) {
+	    Label label = new Label(name);
+		label.setFont(Font.font("Verdana", FontWeight.BOLD, 16));
+	    label.setTextFill(ColorManager.getColor("field_borders"));
+	    Group group = new Group(label);
+	    return group;
+	}
+
 	public static Node getTile(String name) {
 	    Rectangle shape = new Rectangle();
 	    shape.setWidth(Field.FIELD_SIZE-6);
@@ -111,11 +119,11 @@ public class VisualsManager {
 
 	public static Group getSwapper() {
 		Rectangle shape = new Rectangle();
-	    shape.setWidth(3.5*Field.FIELD_SIZE);
+	    shape.setWidth(3*Field.FIELD_SIZE);
 	    shape.setHeight(2*Field.FIELD_SIZE);
 	    shape.setFill(ColorManager.getColor("board_borders"));
 	    Group group = new Group(shape);
-	    group.setTranslateX(-Field.FIELD_SIZE*14);
+	    group.setTranslateX(-Field.FIELD_SIZE*9.5);
 	    group.setTranslateY(Field.FIELD_SIZE*9);
 	    
 		return group;
@@ -127,7 +135,7 @@ public class VisualsManager {
 	    shape.setHeight(2*Field.FIELD_SIZE);
 	    shape.setFill(ColorManager.getColor("board_borders"));
 	    Group group = new Group(shape);
-	    group.setTranslateX(+Field.FIELD_SIZE*8);
+	    group.setTranslateX(Field.FIELD_SIZE*8);
 	    group.setTranslateY(Field.FIELD_SIZE*9);
 	    
 		return group;

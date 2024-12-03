@@ -3,6 +3,7 @@ package checker;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,8 +23,15 @@ public class InMemoryScrabbleWordChecker implements  ScrabbleWordChecker{
      * Process the words file when the class is loaded, and fill a static Map
      */
     static {
-        try {
-            InputStream resourceStream = InMemoryScrabbleWordChecker.class.getResourceAsStream("/collins_scrabble_words_2019.txt");
+        try {            
+            FileInputStream resourceStream = new FileInputStream("./files/collins_scrabble_words_2019.txt");
+
+            if (resourceStream == null) {
+                System.out.println("Failed to find the resource. File path may be incorrect.");
+            } else {
+                System.out.println("Resource found!");
+            }
+
             try (BufferedReader br = new BufferedReader(new InputStreamReader(resourceStream))) {
                 String line;
                 while ((line = br.readLine()) != null) {
